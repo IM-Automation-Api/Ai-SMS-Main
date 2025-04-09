@@ -1,0 +1,41 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:$COMMIT_SHA', '.']
+  
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:$COMMIT_SHA']
+  
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'javascript-node'
+      - '--image'
+      - 'gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'TWILIO_SID=${_TWILIO_SID},TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN},TWILIO_PHONE=${_TWILIO_PHONE},SUPABASE_URL=${_SUPABASE_URL},SUPABASE_KEY=${_SUPABASE_KEY},OPENAI_API_KEY=${_OPENAI_API_KEY},OPENAI_ASSISTANT_ID=${_OPENAI_ASSISTANT_ID},N8N_CHAT_WEBHOOK=${_N8N_CHAT_WEBHOOK}'
+
+# Store images in Google Container Registry
+images:
+  - 'gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:$COMMIT_SHA'
+
+# Substitution variables for environment variables
+# These will be set in the Google Cloud Build trigger
+substitutions:
+  _TWILIO_SID: ''
+  _TWILIO_AUTH_TOKEN: ''
+  _TWILIO_PHONE: ''
+  _SUPABASE_URL: ''
+  _SUPABASE_KEY: ''
+  _OPENAI_API_KEY: ''
+  _OPENAI_ASSISTANT_ID: ''
+  _N8N_CHAT_WEBHOOK: ''
