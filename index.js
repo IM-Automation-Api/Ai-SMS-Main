@@ -12,9 +12,20 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Print all environment variables for debugging (excluding sensitive values)
+console.log('Environment variables:');
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? 'Set' : 'Not set');
+console.log('SUPABASE_KEY:', process.env.SUPABASE_KEY ? 'Set (value hidden)' : 'Not set');
+console.log('TWILIO_SID:', process.env.TWILIO_SID ? 'Set (value hidden)' : 'Not set');
+console.log('TWILIO_AUTH_TOKEN:', process.env.TWILIO_AUTH_TOKEN ? 'Set (value hidden)' : 'Not set');
+console.log('TWILIO_PHONE:', process.env.TWILIO_PHONE ? 'Set (value hidden)' : 'Not set');
+console.log('N8N_CHAT_WEBHOOK:', process.env.N8N_CHAT_WEBHOOK ? 'Set (value hidden)' : 'Not set');
+console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'Set (value hidden)' : 'Not set');
+console.log('OPENAI_ASSISTANT_ID:', process.env.OPENAI_ASSISTANT_ID ? 'Set (value hidden)' : 'Not set');
+
 // Check for required environment variables
 const {
-  SUPABASE_URL,
+  SUPABASE_URL = 'https://tdgxeyjthnhzsqfzravb.supabase.co', // Default URL as fallback
   SUPABASE_KEY,
   TWILIO_SID,
   TWILIO_AUTH_TOKEN,
@@ -32,6 +43,8 @@ if (!TWILIO_AUTH_TOKEN) missingVars.push('TWILIO_AUTH_TOKEN');
 if (!TWILIO_PHONE) missingVars.push('TWILIO_PHONE');
 if (!N8N_CHAT_WEBHOOK) missingVars.push('N8N_CHAT_WEBHOOK');
 if (!OPENAI_API_KEY) missingVars.push('OPENAI_API_KEY');
+
+console.log('Missing variables:', missingVars.length > 0 ? missingVars.join(', ') : 'None');
 
 // Initialize clients if environment variables are available
 let supabase;

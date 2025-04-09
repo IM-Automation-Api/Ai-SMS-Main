@@ -6,6 +6,15 @@ steps:
       - '-c'
       - |
         echo "Verifying environment variables..."
+        echo "SUPABASE_URL: ${_SUPABASE_URL:0:10}... (length: ${#_SUPABASE_URL})"
+        echo "SUPABASE_KEY: ${_SUPABASE_KEY:0:10}... (length: ${#_SUPABASE_KEY})"
+        echo "TWILIO_SID: ${_TWILIO_SID:0:10}... (length: ${#_TWILIO_SID})"
+        echo "TWILIO_AUTH_TOKEN: ${_TWILIO_AUTH_TOKEN:0:10}... (length: ${#_TWILIO_AUTH_TOKEN})"
+        echo "TWILIO_PHONE: ${_TWILIO_PHONE:0:10}... (length: ${#_TWILIO_PHONE})"
+        echo "N8N_CHAT_WEBHOOK: ${_N8N_CHAT_WEBHOOK:0:10}... (length: ${#_N8N_CHAT_WEBHOOK})"
+        echo "OPENAI_API_KEY: ${_OPENAI_API_KEY:0:10}... (length: ${#_OPENAI_API_KEY})"
+        echo "OPENAI_ASSISTANT_ID: ${_OPENAI_ASSISTANT_ID:0:10}... (length: ${#_OPENAI_ASSISTANT_ID})"
+        
         [[ -z "${_SUPABASE_URL}" ]] && echo "ERROR: _SUPABASE_URL is not set" && exit 1
         [[ -z "${_SUPABASE_KEY}" ]] && echo "ERROR: _SUPABASE_KEY is not set" && exit 1
         [[ -z "${_TWILIO_SID}" ]] && echo "ERROR: _TWILIO_SID is not set" && exit 1
