@@ -2,7 +2,7 @@
 .git
 .gitignore
 node_modules/
-.env
+# .env - We need this file for environment variables
 .dockerignore
 README.md
 .devcontainer/

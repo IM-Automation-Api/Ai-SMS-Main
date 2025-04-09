@@ -30,6 +30,8 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 # Copy application code (or built assets if you have a build step)
 COPY --from=builder /usr/src/app/index.js ./
 COPY --from=builder /usr/src/app/supabase_schema.sql ./
+# Copy .env file for environment variables
+COPY .env ./
 # If you have a build output directory, use something like:
 # COPY --from=builder /usr/src/app/dist ./dist
 

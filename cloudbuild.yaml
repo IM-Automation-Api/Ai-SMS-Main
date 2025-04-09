@@ -32,6 +32,25 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:$COMMIT_SHA']
   
+  # Create a .env file for the container
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Creating .env file for the container..."
+        echo "SUPABASE_URL=${_SUPABASE_URL}" > .env
+        echo "SUPABASE_KEY=${_SUPABASE_KEY}" >> .env
+        echo "TWILIO_SID=${_TWILIO_SID}" >> .env
+        echo "TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN}" >> .env
+        echo "TWILIO_PHONE=${_TWILIO_PHONE}" >> .env
+        echo "N8N_CHAT_WEBHOOK=${_N8N_CHAT_WEBHOOK}" >> .env
+        echo "OPENAI_API_KEY=${_OPENAI_API_KEY}" >> .env
+        echo "OPENAI_ASSISTANT_ID=${_OPENAI_ASSISTANT_ID}" >> .env
+        echo "PORT=3000" >> .env
+        echo ".env file created with the following variables:"
+        cat .env | grep -v "KEY\|TOKEN\|SID" || true
+
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud

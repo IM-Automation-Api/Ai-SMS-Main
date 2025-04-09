@@ -2,7 +2,7 @@ node_modules
 npm-debug.log
 .git
 .gitignore
-.env
+# .env - We need this file for environment variables
 .dockerignore
 README.md
 .devcontainer
