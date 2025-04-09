@@ -39,7 +39,14 @@ let twilioClient;
 
 try {
   if (SUPABASE_URL && SUPABASE_KEY) {
-    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Clean up Supabase URL if it includes /rest/v1/
+    let supabaseBaseUrl = SUPABASE_URL;
+    if (supabaseBaseUrl.includes('/rest/v1/')) {
+      supabaseBaseUrl = supabaseBaseUrl.split('/rest/v1/')[0];
+      console.log(`Modified Supabase URL from ${SUPABASE_URL} to ${supabaseBaseUrl}`);
+    }
+    
+    supabase = createClient(supabaseBaseUrl, SUPABASE_KEY);
     console.log('Supabase client initialized successfully');
   } else {
     console.error('Supabase client initialization skipped due to missing environment variables');

@@ -58,6 +58,10 @@ Add the following substitution variables (click "Add variable" for each):
   - Go to your Supabase project dashboard
   - Click on "Settings" in the left sidebar
   - Click on "API" to find your URL and API keys
+  - **IMPORTANT**: For the SUPABASE_URL, you can use either format:
+    - Base URL format: `https://your-project-id.supabase.co`
+    - REST API format: `https://your-project-id.supabase.co/rest/v1/`
+    - The application will automatically handle both formats
 - **OpenAI API Key**: Found in your OpenAI dashboard under API keys
 - **OpenAI Assistant ID**: The ID of your OpenAI Assistant (starts with "asst_")
 - **N8N Chat Webhook**: The webhook URL from your N8N workflow
