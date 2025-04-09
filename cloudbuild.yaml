@@ -1,4 +1,20 @@
 steps:
+  # Verify environment variables
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "Verifying environment variables..."
+        [[ -z "${_SUPABASE_URL}" ]] && echo "ERROR: _SUPABASE_URL is not set" && exit 1
+        [[ -z "${_SUPABASE_KEY}" ]] && echo "ERROR: _SUPABASE_KEY is not set" && exit 1
+        [[ -z "${_TWILIO_SID}" ]] && echo "ERROR: _TWILIO_SID is not set" && exit 1
+        [[ -z "${_TWILIO_AUTH_TOKEN}" ]] && echo "ERROR: _TWILIO_AUTH_TOKEN is not set" && exit 1
+        [[ -z "${_TWILIO_PHONE}" ]] && echo "ERROR: _TWILIO_PHONE is not set" && exit 1
+        [[ -z "${_N8N_CHAT_WEBHOOK}" ]] && echo "ERROR: _N8N_CHAT_WEBHOOK is not set" && exit 1
+        [[ -z "${_OPENAI_API_KEY}" ]] && echo "ERROR: _OPENAI_API_KEY is not set" && exit 1
+        echo "All required environment variables are set."
+
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:$COMMIT_SHA', '.']

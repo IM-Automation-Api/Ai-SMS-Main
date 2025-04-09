@@ -49,6 +49,19 @@ Add the following substitution variables (click "Add variable" for each):
 - `_OPENAI_ASSISTANT_ID`: Your OpenAI Assistant ID
 - `_N8N_CHAT_WEBHOOK`: Your N8N Chat Webhook URL
 
+**IMPORTANT**: All of these environment variables are required for the application to function properly. The build will fail if any of these variables are not set. Make sure to copy the values exactly from your .env file.
+
+#### How to Find These Values
+
+- **Twilio Credentials**: Log in to your Twilio account dashboard at https://www.twilio.com/console
+- **Supabase Credentials**: 
+  - Go to your Supabase project dashboard
+  - Click on "Settings" in the left sidebar
+  - Click on "API" to find your URL and API keys
+- **OpenAI API Key**: Found in your OpenAI dashboard under API keys
+- **OpenAI Assistant ID**: The ID of your OpenAI Assistant (starts with "asst_")
+- **N8N Chat Webhook**: The webhook URL from your N8N workflow
+
 ### 4. Advanced Options (Optional)
 
 - **Timeout**: `1200s` (20 minutes, adjust as needed)

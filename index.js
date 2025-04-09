@@ -5,12 +5,14 @@ import { createClient } from '@supabase/supabase-js';
 import twilio from 'twilio';
 import axios from 'axios';
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Check for required environment variables
 const {
   SUPABASE_URL,
   SUPABASE_KEY,
@@ -21,26 +23,89 @@ const {
   OPENAI_API_KEY
 } = process.env;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-const twilioClient = twilio(TWILIO_SID, TWILIO_AUTH_TOKEN);
+// Validate environment variables
+const missingVars = [];
+if (!SUPABASE_URL) missingVars.push('SUPABASE_URL');
+if (!SUPABASE_KEY) missingVars.push('SUPABASE_KEY');
+if (!TWILIO_SID) missingVars.push('TWILIO_SID');
+if (!TWILIO_AUTH_TOKEN) missingVars.push('TWILIO_AUTH_TOKEN');
+if (!TWILIO_PHONE) missingVars.push('TWILIO_PHONE');
+if (!N8N_CHAT_WEBHOOK) missingVars.push('N8N_CHAT_WEBHOOK');
+if (!OPENAI_API_KEY) missingVars.push('OPENAI_API_KEY');
+
+// Initialize clients if environment variables are available
+let supabase;
+let twilioClient;
+
+try {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('Supabase client initialized successfully');
+  } else {
+    console.error('Supabase client initialization skipped due to missing environment variables');
+  }
+  
+  if (TWILIO_SID && TWILIO_AUTH_TOKEN) {
+    twilioClient = twilio(TWILIO_SID, TWILIO_AUTH_TOKEN);
+    console.log('Twilio client initialized successfully');
+  } else {
+    console.error('Twilio client initialization skipped due to missing environment variables');
+  }
+} catch (error) {
+  console.error('Error initializing clients:', error.message);
+}
 
 async function logToSupabase({ phone, type, message, thread_id, lead_id }) {
-  const { error } = await supabase.from('logs').insert([
-    {
-      phone_number: phone,
-      type,
-      message,
-      thread_id,
-      lead_id
-    }
-  ]);
+  if (!supabase) {
+    console.error('Cannot log to Supabase: client not initialized');
+    return;
+  }
+  
+  try {
+    const { error } = await supabase.from('logs').insert([
+      {
+        phone_number: phone,
+        type,
+        message,
+        thread_id,
+        lead_id
+      }
+    ]);
 
-  if (error) {
-    console.error('Failed to write to logs:', error.message);
+    if (error) {
+      console.error('Failed to write to logs:', error.message);
+    }
+  } catch (error) {
+    console.error('Error logging to Supabase:', error.message);
   }
 }
 
+// Add a health check endpoint
+app.get('/', (req, res) => {
+  const status = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: {
+      supabase: !!supabase,
+      twilio: !!twilioClient,
+      missingVars: missingVars.length > 0 ? missingVars : 'none'
+    }
+  };
+  
+  res.json(status);
+});
+
 app.post('/sms', async (req, res) => {
+  // Check if required clients are initialized
+  if (!supabase || !twilioClient) {
+    console.error('Cannot process SMS: required clients not initialized');
+    return res.status(500).json({ 
+      error: 'Server configuration error', 
+      details: 'Required services not initialized',
+      missing: missingVars
+    });
+  }
+
   const phone = req.body.From;
   const incomingMessage = req.body.Body?.trim();
 

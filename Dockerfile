@@ -21,6 +21,8 @@ FROM node:18-alpine AS runtime
 WORKDIR /usr/src/app
 # Set NODE_ENV
 ENV NODE_ENV production
+# Install wget for healthcheck
+RUN apk --no-cache add wget
 # Copy package files
 COPY package*.json ./
 # Copy dependencies from deps stage
@@ -30,6 +32,10 @@ COPY --from=builder /usr/src/app/index.js ./
 COPY --from=builder /usr/src/app/supabase_schema.sql ./
 # If you have a build output directory, use something like:
 # COPY --from=builder /usr/src/app/dist ./dist
+
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
 
 # Expose the port
 EXPOSE 3000
