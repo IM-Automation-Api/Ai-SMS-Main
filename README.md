@@ -1,21 +1,22 @@
 # SMS AI Assistant
 
-A Node.js application that integrates Twilio SMS, Supabase, and OpenAI to create an AI-powered SMS chatbot.
+A Node.js application that integrates Twilio SMS, Supabase, and Groq to create an AI-powered SMS chatbot.
 
 ## Overview
 
 This application:
 - Receives SMS messages via a Twilio webhook
 - Stores conversation history in a Supabase database
-- Processes messages using OpenAI's API
+- Processes messages using Groq's API with Llama models
 - Sends AI-generated responses back to users via SMS
+- Supports outbound initial contact to new leads
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - Twilio account with a phone number
 - Supabase account with a project set up
-- OpenAI API key
+- Groq API key
 - N8N instance for workflow automation (optional)
 
 ## Environment Variables
@@ -32,14 +33,12 @@ TWILIO_PHONE=your_twilio_phone_number
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
 
-# OpenAI API Key
-OPENAI_API_KEY=your_openai_api_key
+# Groq API Key
+GROQ_KEY=your_groq_api_key
 
-# OpenAI Assistant ID
-OPENAI_ASSISTANT_ID=your_openai_assistant_id
-
-# Webhook URL
+# Webhook URL (optional)
 N8N_CHAT_WEBHOOK=your_n8n_webhook_url
+N8N_INITIAL_WEBHOOK=your_n8n_initial_webhook_url
 
 # Server Port (optional)
 PORT=3000
@@ -48,7 +47,8 @@ PORT=3000
 ## Database Setup
 
 The application requires a Supabase database with the following tables:
-- `leads`: Stores user information and OpenAI thread IDs
+- `leads`: Stores user information
+- `new leads`: Stores new leads for initial outreach
 - `conversations`: Stores the message history
 - `prompts`: Optional table for system prompts
 
@@ -77,6 +77,11 @@ The server will run on port 3000 by default (or the port specified in your `.env
 Configure your Twilio phone number to send incoming SMS messages to:
 ```
 https://your-server-url/sms
+```
+
+For outbound initial contact, you can trigger the process by sending a POST request to:
+```
+https://your-server-url/sms-agent/send-initial
 ```
 
 You may need to use a service like ngrok to expose your local server to the internet during development.

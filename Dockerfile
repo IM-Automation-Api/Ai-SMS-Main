@@ -28,7 +28,7 @@ COPY package*.json ./
 # Copy dependencies from deps stage
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 # Copy application code (or built assets if you have a build step)
-COPY --from=builder /usr/src/app/index.js ./
+COPY --from=builder /usr/src/app/index\(Groq\).js ./index.js
 COPY --from=builder /usr/src/app/supabase_schema.sql ./
 # Copy .env file for environment variables
 COPY .env ./
