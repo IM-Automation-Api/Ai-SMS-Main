@@ -111,7 +111,7 @@ This approach results in smaller, more secure Docker images by:
 
 ```bash
 # Build the Docker image
-docker build -t gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:local .
+docker build -t PROJECTID:local .
 
 # Run the container
 docker run -p 3000:3000 --env-file .env gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:local
@@ -128,8 +128,8 @@ This project is configured for deployment to Google Cloud Run using Google Cloud
 
 2. Create a Cloud Build trigger in the Google Cloud Console:
    - See the detailed setup guide in [CLOUD_RUN_SETUP.md](CLOUD_RUN_SETUP.md)
-   - The trigger uses the repository: `mlynnf123/javascript-node`
-   - Image name: `gcr.io/tactile-sentry-452823-f7/github.com/mlynnf123/javascript-node:$COMMIT_SHA`
+   - The trigger uses the repository: 
+   - Image name: 
 
 3. Push your code to trigger a build and deployment:
    ```bash
@@ -138,7 +138,7 @@ This project is configured for deployment to Google Cloud Run using Google Cloud
 
 4. After deployment, update your Twilio webhook URL to point to your Cloud Run service URL:
    ```
-   https://javascript-node-730199417968.us-central1.run.app/sms
+https://ai-sms-main-776115198957.us-central1.run.app/sms
    ```
 
 ### Deployment Scripts
@@ -167,7 +167,7 @@ chmod +x deploy-to-cloud.sh
 ./deploy-to-cloud.sh
 ```
 
-This script submits a build to Google Cloud Build using the preconfigured project ID (`tactile-sentry-452823-f7`) and the cloudbuild.yaml configuration.
+This script submits a build to Google Cloud Build using the preconfigured project ID and the cloudbuild.yaml configuration.
 
 ## Cloud Run Setup
 
