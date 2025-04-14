@@ -1,9 +1,17 @@
 
--- Leads table with thread_id for OpenAI Assistants
+-- Leads table for storing user information
 CREATE TABLE leads (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   phone_number TEXT UNIQUE NOT NULL,
-  thread_id TEXT,
+  first_name TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- New leads table for initial outreach
+CREATE TABLE "new leads" (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  phone_number TEXT UNIQUE NOT NULL,
+  first_name TEXT,
   created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -16,13 +24,10 @@ CREATE TABLE conversations (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Prompts table (optional if needed for system prompt variations)
+-- Prompts table for system and initial prompts
 CREATE TABLE prompts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   prompt TEXT NOT NULL,
-  is_active BOOLEAN DEFAULT FALSE,
+  type TEXT CHECK (type IN ('system', 'initial')),
   created_at TIMESTAMP DEFAULT NOW()
 );
-
--- Only one prompt can be active at a time
-CREATE UNIQUE INDEX only_one_prompt_active ON prompts (is_active) WHERE is_active;

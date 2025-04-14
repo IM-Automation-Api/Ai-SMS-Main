@@ -45,9 +45,9 @@ Add the following substitution variables (click "Add variable" for each):
 - `_TWILIO_PHONE`: Your Twilio Phone Number
 - `_SUPABASE_URL`: Your Supabase URL
 - `_SUPABASE_KEY`: Your Supabase Key
-- `_OPENAI_API_KEY`: Your OpenAI API Key
-- `_OPENAI_ASSISTANT_ID`: Your OpenAI Assistant ID
+- `_GROQ_KEY`: Your Groq API Key
 - `_N8N_CHAT_WEBHOOK`: Your N8N Chat Webhook URL
+- `_N8N_INITIAL_WEBHOOK`: Your N8N Initial Webhook URL (optional)
 
 **IMPORTANT**: All of these environment variables are required for the application to function properly. The build will fail if any of these variables are not set. Make sure to copy the values exactly from your .env file.
 
@@ -62,9 +62,8 @@ Add the following substitution variables (click "Add variable" for each):
     - Base URL format: `https://your-project-id.supabase.co`
     - REST API format: `https://your-project-id.supabase.co/rest/v1/`
     - The application will automatically handle both formats
-- **OpenAI API Key**: Found in your OpenAI dashboard under API keys
-- **OpenAI Assistant ID**: The ID of your OpenAI Assistant (starts with "asst_")
-- **N8N Chat Webhook**: The webhook URL from your N8N workflow
+- **Groq API Key**: Found in your Groq dashboard under API keys
+- **N8N Webhooks**: The webhook URLs from your N8N workflows
 
 ### 4. Advanced Options (Optional)
 

@@ -12,8 +12,8 @@ steps:
         echo "TWILIO_AUTH_TOKEN: ${_TWILIO_AUTH_TOKEN:0:10}... (length: ${#_TWILIO_AUTH_TOKEN})"
         echo "TWILIO_PHONE: ${_TWILIO_PHONE:0:10}... (length: ${#_TWILIO_PHONE})"
         echo "N8N_CHAT_WEBHOOK: ${_N8N_CHAT_WEBHOOK:0:10}... (length: ${#_N8N_CHAT_WEBHOOK})"
-        echo "OPENAI_API_KEY: ${_OPENAI_API_KEY:0:10}... (length: ${#_OPENAI_API_KEY})"
-        echo "OPENAI_ASSISTANT_ID: ${_OPENAI_ASSISTANT_ID:0:10}... (length: ${#_OPENAI_ASSISTANT_ID})"
+        echo "N8N_INITIAL_WEBHOOK: ${_N8N_INITIAL_WEBHOOK:0:10}... (length: ${#_N8N_INITIAL_WEBHOOK})"
+        echo "GROQ_KEY: ${_GROQ_KEY:0:10}... (length: ${#_GROQ_KEY})"
         
         [[ -z "${_SUPABASE_URL}" ]] && echo "ERROR: _SUPABASE_URL is not set" && exit 1
         [[ -z "${_SUPABASE_KEY}" ]] && echo "ERROR: _SUPABASE_KEY is not set" && exit 1
@@ -21,7 +21,7 @@ steps:
         [[ -z "${_TWILIO_AUTH_TOKEN}" ]] && echo "ERROR: _TWILIO_AUTH_TOKEN is not set" && exit 1
         [[ -z "${_TWILIO_PHONE}" ]] && echo "ERROR: _TWILIO_PHONE is not set" && exit 1
         [[ -z "${_N8N_CHAT_WEBHOOK}" ]] && echo "ERROR: _N8N_CHAT_WEBHOOK is not set" && exit 1
-        [[ -z "${_OPENAI_API_KEY}" ]] && echo "ERROR: _OPENAI_API_KEY is not set" && exit 1
+        [[ -z "${_GROQ_KEY}" ]] && echo "ERROR: _GROQ_KEY is not set" && exit 1
         echo "All required environment variables are set."
 
   # Build the container image
@@ -45,8 +45,8 @@ steps:
         echo "TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN}" >> .env
         echo "TWILIO_PHONE=${_TWILIO_PHONE}" >> .env
         echo "N8N_CHAT_WEBHOOK=${_N8N_CHAT_WEBHOOK}" >> .env
-        echo "OPENAI_API_KEY=${_OPENAI_API_KEY}" >> .env
-        echo "OPENAI_ASSISTANT_ID=${_OPENAI_ASSISTANT_ID}" >> .env
+        echo "GROQ_KEY=${_GROQ_KEY}" >> .env
+        echo "N8N_INITIAL_WEBHOOK=${_N8N_INITIAL_WEBHOOK}" >> .env
         echo "PORT=3000" >> .env
         echo ".env file created with the following variables:"
         cat .env | grep -v "KEY\|TOKEN\|SID" || true
@@ -66,7 +66,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--set-env-vars'
-      - 'TWILIO_SID=${_TWILIO_SID},TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN},TWILIO_PHONE=${_TWILIO_PHONE},SUPABASE_URL=${_SUPABASE_URL},SUPABASE_KEY=${_SUPABASE_KEY},OPENAI_API_KEY=${_OPENAI_API_KEY},OPENAI_ASSISTANT_ID=${_OPENAI_ASSISTANT_ID},N8N_CHAT_WEBHOOK=${_N8N_CHAT_WEBHOOK}'
+      - 'TWILIO_SID=${_TWILIO_SID},TWILIO_AUTH_TOKEN=${_TWILIO_AUTH_TOKEN},TWILIO_PHONE=${_TWILIO_PHONE},SUPABASE_URL=${_SUPABASE_URL},SUPABASE_KEY=${_SUPABASE_KEY},GROQ_KEY=${_GROQ_KEY},N8N_CHAT_WEBHOOK=${_N8N_CHAT_WEBHOOK},N8N_INITIAL_WEBHOOK=${_N8N_INITIAL_WEBHOOK}'
 
 # Store images in Google Container Registry
 images:
@@ -80,6 +80,6 @@ substitutions:
   _TWILIO_PHONE: ''
   _SUPABASE_URL: ''
   _SUPABASE_KEY: ''
-  _OPENAI_API_KEY: ''
-  _OPENAI_ASSISTANT_ID: ''
+  _GROQ_KEY: ''
   _N8N_CHAT_WEBHOOK: ''
+  _N8N_INITIAL_WEBHOOK: ''
