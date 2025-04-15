@@ -82,36 +82,53 @@ app.post("/sms-agent/send-initial", async (req, res) => {
 
     // Send initial message based on client_id
     const client_id = lead.client_id;
+    console.log(`Fetching prompt for client_id: ${client_id}, type: initial`);
+    console.log(`client_id type: ${typeof client_id}`);
     
-    // Fetch client-specific initial message
-    const { data: initialMessage, error } = await supabase
-      .from("prompts")
-      .select("prompt")
-      .eq("type", "initial")
-      .eq("client_id", client_id)
-      .single();
+    // Make sure client_id is treated as a number
+    const numericClientId = Number(client_id);
+    console.log(`Numeric client_id: ${numericClientId}, type: ${typeof numericClientId}`);
     
-    if (error || !initialMessage) {
-      console.error(`Error fetching initial message for client_id ${client_id}:`, error);
-      continue; // Skip this lead if we can't find a prompt for it
-    }
-    
-    console.log("initialMessage", initialMessage);
-    // intermpolate first_name into initialMessage
-    const processedMessage = initialMessage.prompt.replace(
-      "{{first_name}}",
-      first_name,
-    );
-    await twilioClient.messages.create({
-      body: processedMessage,
-      from: TWILIO_PHONE,
-      to: phone,
-    });
+    try {
+      // Fetch client-specific initial message
+      const { data: initialMessage, error } = await supabase
+        .from("prompts")
+        .select("prompt")
+        .eq("type", "initial")
+        .eq("client_id", numericClientId)
+        .single();
+      
+      if (error) {
+        console.error(`Error fetching initial message for client_id ${numericClientId}:`, error);
+        console.error(`Error details:`, JSON.stringify(error));
+        continue; // Skip this lead if we can't find a prompt for it
+      }
+      
+      if (!initialMessage) {
+        console.error(`No initial message found for client_id ${numericClientId}`);
+        continue; // Skip this lead if we can't find a prompt for it
+      }
+      
+      console.log("initialMessage", initialMessage);
+      // intermpolate first_name into initialMessage
+      const processedMessage = initialMessage.prompt.replace(
+        "{{first_name}}",
+        first_name,
+      );
+      await twilioClient.messages.create({
+        body: processedMessage,
+        from: TWILIO_PHONE,
+        to: phone,
+      });
 
-    leadsInserted.push({
-      phone: phone,
-      first_name: first_name,
-    });
+      leadsInserted.push({
+        phone: phone,
+        first_name: first_name,
+      });
+    } catch (err) {
+      console.error(`Unexpected error processing lead with client_id ${numericClientId}:`, err);
+      continue; // Skip this lead if there's an error
+    }
   }
   res.status(200).json({
     success: true,
@@ -185,20 +202,30 @@ app.post("/sms", async (req, res) => {
   
   // Get client_id from the lead
   const client_id = lead.client_id;
+  console.log(`Fetching prompts for client_id: ${client_id}`);
+  
+  // Make sure client_id is treated as a number
+  const numericClientId = Number(client_id);
+  console.log(`Numeric client_id: ${numericClientId}, type: ${typeof numericClientId}`);
   
   // Fetch client-specific prompts
-  const { data: prompts } = await supabase
+  const { data: prompts, error: promptsError } = await supabase
     .from("prompts")
     .select("prompt, type")
     .in("type", ["initial", "system"])
-    .eq("client_id", client_id);
+    .eq("client_id", numericClientId);
   
   // If no prompts found, log a warning
-  if (!prompts || prompts.length === 0) {
-    console.warn(`No prompts found for client_id: ${client_id}`);
+  if (promptsError) {
+    console.warn(`Error fetching prompts for client_id ${numericClientId}:`, promptsError);
+    console.warn(`Error details:`, JSON.stringify(promptsError));
   }
   
-  for (const prompt of prompts) {
+  if (!prompts || prompts.length === 0) {
+    console.warn(`No prompts found for client_id: ${numericClientId}`);
+  }
+  
+  for (const prompt of prompts || []) {
     if (prompt.type === "initial") {
       history.unshift({ role: "user", content: prompt.prompt });
     } else if (prompt.type === "system") {
