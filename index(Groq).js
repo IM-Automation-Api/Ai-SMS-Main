@@ -80,12 +80,22 @@ app.post("/sms-agent/send-initial", async (req, res) => {
     // Remove from New leads now that it's in leads.
     await supabase.from("new leads").delete().eq("id", lead.id);
 
-    // Send initial message
-    const { data: initialMessage } = await supabase
+    // Send initial message based on client_id
+    const client_id = lead.client_id;
+    
+    // Fetch client-specific initial message
+    const { data: initialMessage, error } = await supabase
       .from("prompts")
       .select("prompt")
       .eq("type", "initial")
+      .eq("client_id", client_id)
       .single();
+    
+    if (error || !initialMessage) {
+      console.error(`Error fetching initial message for client_id ${client_id}:`, error);
+      continue; // Skip this lead if we can't find a prompt for it
+    }
+    
     console.log("initialMessage", initialMessage);
     // intermpolate first_name into initialMessage
     const processedMessage = initialMessage.prompt.replace(
@@ -126,9 +136,33 @@ app.post("/sms", async (req, res) => {
     .single();
 
   if (!lead) {
+    // For new leads coming from inbound messages, we need to determine the client_id
+    // You'll need to implement logic to determine which client this lead belongs to
+    // This could be based on the phone number, message content, or other factors
+    
+    // For example, you might query another table to determine the client_id
+    // const { data: clientMapping } = await supabase
+    //   .from("client_phone_mappings")
+    //   .select("client_id")
+    //   .eq("phone_prefix", phone.substring(0, 6))
+    //   .single();
+    
+    // const client_id = clientMapping?.client_id;
+    
+    // For now, we'll assume you have a way to determine the client_id
+    // Replace this with your actual logic to determine the client_id
+    const client_id = req.body.To; // Example: using the Twilio number the user texted as a way to identify the client
+    
+    if (!client_id) {
+      return res.status(400).send("Unable to determine client_id for new lead");
+    }
+    
     const { data: newLead } = await supabase
       .from("leads")
-      .insert([{ phone: phone }])
+      .insert([{
+        phone: phone,
+        client_id: client_id
+      }])
       .select()
       .single();
     lead = newLead;
@@ -148,11 +182,22 @@ app.post("/sms", async (req, res) => {
     .from("conversations")
     .select("role, content")
     .eq("lead_id", lead.id);
-  // Add initial message and system prompt to history
+  
+  // Get client_id from the lead
+  const client_id = lead.client_id;
+  
+  // Fetch client-specific prompts
   const { data: prompts } = await supabase
     .from("prompts")
     .select("prompt, type")
-    .in("type", ["initial", "system"]);
+    .in("type", ["initial", "system"])
+    .eq("client_id", client_id);
+  
+  // If no prompts found, log a warning
+  if (!prompts || prompts.length === 0) {
+    console.warn(`No prompts found for client_id: ${client_id}`);
+  }
+  
   for (const prompt of prompts) {
     if (prompt.type === "initial") {
       history.unshift({ role: "user", content: prompt.prompt });
