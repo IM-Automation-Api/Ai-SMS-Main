@@ -1,9 +1,16 @@
+-- Clients table for storing client information
+CREATE TABLE clients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
 -- Leads table for storing user information
 CREATE TABLE leads (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   phone_number TEXT UNIQUE NOT NULL,
   first_name TEXT,
+  client_id UUID REFERENCES clients(id),
   created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -12,6 +19,7 @@ CREATE TABLE "new leads" (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   phone_number TEXT UNIQUE NOT NULL,
   first_name TEXT,
+  client_id UUID REFERENCES clients(id),
   created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -29,5 +37,6 @@ CREATE TABLE prompts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   prompt TEXT NOT NULL,
   type TEXT CHECK (type IN ('system', 'initial')),
+  client_id UUID REFERENCES clients(id),
   created_at TIMESTAMP DEFAULT NOW()
 );
